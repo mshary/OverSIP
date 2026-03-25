@@ -1,0 +1,3 @@
+stud-dbgsym_0.3~0.20111212_amd64.deb universe/debug optional automatic=yes
+stud_0.3~0.20111212_amd64.buildinfo universe/net optional
+stud_0.3~0.20111212_amd64.deb universe/net optional

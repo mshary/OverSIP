@@ -1,0 +1,23 @@
+dpkg-buildpackage: info: source package stud
+dpkg-buildpackage: info: source version 0.3~0.20111212-1
+dpkg-buildpackage: info: source distribution unstable
+dpkg-buildpackage: info: source changed by Charlie Root <root@example.com>
+ dpkg-source --before-build .
+dpkg-buildpackage: info: host architecture amd64
+ debian/rules clean
+dh clean
+dh: warning: Use of debian/compat is deprecated and will be removed in debhelper (>= 14~).
+   debian/rules override_dh_auto_clean
+make[1]: Entering directory '/home/shahzad/tmp/OverSIP/thirdparty/stud'
+rm -rf ebtree
+make clean
+make[2]: Entering directory '/home/shahzad/tmp/OverSIP/thirdparty/stud'
+rm -f stud stud.o ringbuffer.o configuration.o
+make[2]: Leaving directory '/home/shahzad/tmp/OverSIP/thirdparty/stud'
+make[1]: Leaving directory '/home/shahzad/tmp/OverSIP/thirdparty/stud'
+   dh_clean
+dh_clean: warning: Use of debian/compat is deprecated and will be removed in debhelper (>= 14~).
+ dpkg-source -b .
+dpkg-source: error: native package version may not have a revision
+dpkg-source: info: using source format '1.0'
+dpkg-buildpackage: error: dpkg-source -b . subprocess failed with exit status 2
