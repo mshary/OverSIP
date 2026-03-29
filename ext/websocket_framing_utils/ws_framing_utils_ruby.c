@@ -8,6 +8,17 @@ static VALUE mWebSocket;
 static VALUE mFramingUtils;
 static VALUE cUtf8Validator;
 
+/* Forward declaration */
+static void Utf8Validator_free(void *validator);
+
+/* TypedData structure for utf8_validator */
+static const rb_data_type_t utf8_validator_type = {
+    "utf8_validator",
+    {0, Utf8Validator_free, 0},
+    0,
+    0,
+    RUBY_TYPED_FREE_IMMEDIATELY};
+
 
 
 /*
@@ -70,7 +81,7 @@ VALUE Utf8Validator_alloc(VALUE klass)
 
   validator->state = UTF8_ACCEPT;
 
-  obj = Data_Wrap_Struct(klass, NULL, Utf8Validator_free, validator);
+  obj = TypedData_Wrap_Struct(klass, &utf8_validator_type, validator);
   return obj;
 }
 
@@ -79,7 +90,7 @@ VALUE Utf8Validator_reset(VALUE self)
 {
   TRACE();
   utf8_validator *validator = NULL;
-  DATA_GET(self, utf8_validator, validator);
+  TYPEDDATA_GET(self, utf8_validator, validator, &utf8_validator_type);
 
   validator->state = UTF8_ACCEPT;
 
@@ -103,7 +114,7 @@ VALUE Utf8Validator_validate(VALUE self, VALUE string)
   REQUIRE_TYPE(string, T_STRING);
   str = (uint8_t *)RSTRING_PTR(string);
 
-  DATA_GET(self, utf8_validator, validator);
+  TYPEDDATA_GET(self, utf8_validator, validator, &utf8_validator_type);
 
   for(i=0; i < RSTRING_LEN(string); i++)
     if (utf8_decode(&validator->state, &validator->codepoint, str[i]) == UTF8_REJECT)

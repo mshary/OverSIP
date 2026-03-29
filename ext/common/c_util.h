@@ -36,7 +36,7 @@ static int str_to_int(const char* str, size_t len)
  * @len: The number of characters to be searched
  * @c: The character to search for
  */
-static char *__attribute__((unused)) strnchr(const char *s, size_t len,
+static char __attribute__((unused)) *strnchr(const char *s, size_t len,
                                              size_t c) {
   TRACE();
   for (; len--; ++s) {
@@ -51,7 +51,7 @@ static char *__attribute__((unused)) strnchr(const char *s, size_t len,
  * str_find_upcase: Returns non zero if the string (*str, len) contains at least
  * an upcase letter.
  */
-static char *__attribute__((unused)) str_find_upcase(const char *s,
+static char __attribute__((unused)) *str_find_upcase(const char *s,
                                                      size_t len) {
   TRACE();
   for (; len--; ++s) {
