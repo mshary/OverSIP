@@ -17,8 +17,8 @@
 /*
  * my_rb_str_hex_unescape: Unescapes hexadecimal encoded symbols (%NN).
  */
-static VALUE my_rb_str_hex_unescape(const char *str, size_t len)
-{
+static VALUE __attribute__((unused)) my_rb_str_hex_unescape(const char *str,
+                                                            size_t len) {
   TRACE();
   /* Check if hexadecimal unescaping is required. */
   if (strnchr(str, len, '%')) {

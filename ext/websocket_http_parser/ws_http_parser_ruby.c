@@ -8,6 +8,17 @@
 
 static VALUE headerize(const char*, size_t);
 
+/* Forward declaration */
+static void HttpRequestParser_free(void *parser);
+
+/* TypedData structure for ws_http_request_parser */
+static const rb_data_type_t http_request_parser_type = {
+    "ws_http_request_parser",
+    {0, HttpRequestParser_free, 0},
+    0,
+    0,
+    RUBY_TYPED_FREE_IMMEDIATELY};
+
 
 static VALUE mOverSIP;
 static VALUE eOverSIPError;
@@ -100,7 +111,7 @@ static void req_uri_scheme(void *data, const char *at, size_t length, enum uri_s
 {
   TRACE();
   VALUE parsed = (VALUE)data;
-  VALUE v;
+  VALUE v = Qnil;
 
   switch(scheme) {
     case uri_scheme_http:     v = symbol_http;   break;
@@ -371,7 +382,7 @@ VALUE HttpRequestParser_alloc(VALUE klass)
 
   ws_http_request_parser_init(parser);
 
-  obj = Data_Wrap_Struct(klass, NULL, HttpRequestParser_free, parser);
+  obj = TypedData_Wrap_Struct(klass, &http_request_parser_type, parser);
   return obj;
 }
 
@@ -386,7 +397,7 @@ VALUE HttpRequestParser_init(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
   ws_http_request_parser_init(parser);
 
   return self;
@@ -404,7 +415,7 @@ VALUE HttpRequestParser_reset(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
   ws_http_request_parser_init(parser);
 
   return Qnil;
@@ -422,7 +433,7 @@ VALUE HttpRequestParser_finish(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
   ws_http_request_parser_finish(parser);
 
   return ws_http_request_parser_is_finished(parser) ? Qtrue : Qfalse;
@@ -441,7 +452,7 @@ VALUE HttpRequestParser_execute(VALUE self, VALUE req_hash, VALUE buffer, VALUE 
   REQUIRE_TYPE(buffer, T_STRING);
   REQUIRE_TYPE(start, T_FIXNUM);
 
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
 
   from = FIX2INT(start);
   dptr = RSTRING_PTR(buffer);
@@ -471,7 +482,7 @@ VALUE HttpRequestParser_has_error(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
 
   return ws_http_request_parser_has_error(parser) ? Qtrue : Qfalse;
 }
@@ -487,7 +498,7 @@ VALUE HttpRequestParser_error(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
 
   if(ws_http_request_parser_has_error(parser)) {
     char *parsing_error_str;
@@ -562,7 +573,7 @@ VALUE HttpRequestParser_is_finished(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
 
   return ws_http_request_parser_is_finished(parser) ? Qtrue : Qfalse;
 }
@@ -579,7 +590,7 @@ VALUE HttpRequestParser_nread(VALUE self)
 {
   TRACE();
   ws_http_request_parser *parser = NULL;
-  DATA_GET(self, ws_http_request_parser, parser);
+  TYPEDDATA_GET(self, ws_http_request_parser, parser, &http_request_parser_type);
 
   return INT2FIX(parser->nread);
 }
