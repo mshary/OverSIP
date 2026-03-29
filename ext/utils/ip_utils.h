@@ -20,7 +20,7 @@ enum enum_ip_type utils_ip_parser_execute(const char *str, size_t len);
 
 
 /*! \brief Return 1 if both pure IP's are equal, 0 otherwise. */
-static int utils_compare_pure_ips(char *ip1, size_t len1, enum enum_ip_type ip1_type, char *ip2, size_t len2, enum enum_ip_type ip2_type)
+static int __attribute__((unused)) utils_compare_pure_ips(char *ip1, size_t len1, enum enum_ip_type ip1_type, char *ip2, size_t len2, enum enum_ip_type ip2_type)
 {
   struct in_addr in_addr1, in_addr2;
   struct in6_addr in6_addr1, in6_addr2;

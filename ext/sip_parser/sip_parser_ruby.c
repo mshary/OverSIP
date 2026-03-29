@@ -9,6 +9,16 @@
 
 static VALUE my_rb_str_tel_number_clean(const char*, size_t);
 
+static void SipMessageParser_free(void *parser);
+
+/* TypedData structure for sip_message_parser */
+static const rb_data_type_t sip_message_parser_type = {
+    "sip_message_parser",
+    {0, SipMessageParser_free, 0},
+    0,
+    0,
+    RUBY_TYPED_FREE_IMMEDIATELY};
+
 static VALUE mOverSIP;
 static VALUE eOverSIPError;
 
@@ -123,7 +133,7 @@ static sip_uri_parser *global_sip_uri_parser;
 static void data_type(void *parser, enum data_type data_type)
 {
   TRACE();
-  VALUE parsed;
+  VALUE parsed = Qnil;
   sip_message_parser *sp = (sip_message_parser*)parser;
 
   switch(data_type) {
@@ -166,7 +176,6 @@ static void init_component(VALUE parsed, enum component msg_component)
 static void header(VALUE parsed, const char *hdr_field, size_t hdr_field_len, const char *hdr_value, size_t hdr_value_len, enum header_field hdr_field_name)
 {
   TRACE();
-  char *ch, *end;
   VALUE v, f, el;
   VALUE headers, array;
 
@@ -457,7 +466,7 @@ static VALUE get_uri_object(VALUE parsed, enum uri_owner owner)
 static void uri_scheme(VALUE parsed, enum uri_owner owner, const char *at, size_t length, enum uri_scheme scheme)
 {
   TRACE();
-  VALUE v;
+  VALUE v = Qnil;
 
   switch(scheme) {
     case uri_scheme_sip:     v = symbol_sip;   break;
@@ -498,7 +507,7 @@ static void uri_host(VALUE parsed, enum uri_owner owner, const char *at, size_t 
 {
   TRACE();
   VALUE v;
-  VALUE host_type;
+  VALUE host_type = Qnil;
 
   /* If it's a domain and ends with ".", remove it. */
   if (at[length-1] == '.')
@@ -538,17 +547,19 @@ static void uri_param(VALUE parsed, enum uri_owner owner, const char *key, size_
   TRACE();
   VALUE uri, params, v;
 
-  if ((uri = get_uri_object(parsed, owner)) == Qnil)
+  if ((uri = get_uri_object(parsed, owner)) == Qnil) {
     return;
+  }
 
   if ((params = rb_ivar_get(uri, id_uri_params)) == Qnil) {
     params = rb_hash_new();
     rb_ivar_set(uri, id_uri_params, params);
   }
-  if (value_len > 0)
+  if (value_len > 0) {
     v = RB_STR_UTF8_NEW(value, value_len);
-  else
+  } else {
     v = Qnil;
+  }
   rb_hash_aset(params, my_rb_str_downcase(key, key_len), v);
 }
 
@@ -556,7 +567,8 @@ static void uri_param(VALUE parsed, enum uri_owner owner, const char *key, size_
 static void uri_known_param(VALUE parsed, enum uri_owner owner, enum uri_param_name param_name, const char *at, size_t length, int param_value)
 {
   TRACE();
-  VALUE p, v;
+  VALUE p = Qnil;
+  VALUE v = Qnil;
 
   switch(param_name) {
     case uri_param_transport:
@@ -577,11 +589,13 @@ static void uri_known_param(VALUE parsed, enum uri_owner owner, enum uri_param_n
       v = rb_str_new(at, length);
       break;
     case uri_tel_phone_context:
-      if (length == 0)
+      if (length == 0) {
         return;
+      }
       /* If it's a domain and ends with ".", remove it. */
-      if (at[length-1] == '.')
+      if (at[length - 1] == '.') {
         length--;
+      }
       p = id_uri_phone_context_param;
       v = my_rb_str_downcase(at, length);
       break;
@@ -596,16 +610,16 @@ static void uri_known_param(VALUE parsed, enum uri_owner owner, enum uri_param_n
 static void uri_has_param(VALUE parsed, enum uri_owner owner, enum uri_param_name param_name)
 {
   TRACE();
-
   VALUE p;
 
   switch(param_name) {
     case uri_param_lr:  p = id_uri_lr_param;  break;
     case uri_param_ob:  p = id_uri_ob_param;  break;
-    default:  break;
-  }
+    default:
+      return;
+    }
 
-  rb_ivar_set(get_uri_object(parsed, owner), p, Qtrue);
+    rb_ivar_set(get_uri_object(parsed, owner), p, Qtrue);
 }
 
 
@@ -708,9 +722,8 @@ static void msg_contact_has_reg_id(VALUE parsed)
 static void option_tag(VALUE parsed, enum header_field header_field, const char *at, size_t length)
 {
   TRACE();
-  VALUE v;
-  VALUE id_option_tag_owner;
-  VALUE option_tag_owner;
+  VALUE id_option_tag_owner = Qnil;
+  VALUE option_tag_owner = Qnil;
 
   switch(header_field) {
     case header_field_require:        id_option_tag_owner = id_require;        break;
@@ -828,7 +841,7 @@ VALUE SipMessageParser_alloc(VALUE klass)
 
   sip_message_parser_init(parser);
 
-  obj = Data_Wrap_Struct(klass, NULL, SipMessageParser_free, parser);
+  obj = TypedData_Wrap_Struct(klass, &sip_message_parser_type, parser);
   return obj;
 }
 
@@ -843,7 +856,7 @@ VALUE SipMessageParser_init(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
   sip_message_parser_init(parser);
 
   /* NOTE: This allows the C struct to access to the VALUE element of the Ruby
@@ -865,7 +878,7 @@ VALUE SipMessageParser_reset(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
   sip_message_parser_init(parser);
 
   return Qnil;
@@ -883,7 +896,7 @@ VALUE SipMessageParser_finish(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
   sip_message_parser_finish(parser);
 
   return sip_message_parser_is_finished(parser) ? Qtrue : Qfalse;
@@ -905,7 +918,7 @@ VALUE SipMessageParser_execute(VALUE self, VALUE buffer, VALUE start)
   REQUIRE_TYPE(buffer, T_STRING);
   REQUIRE_TYPE(start, T_FIXNUM);
 
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   from = FIX2INT(start);
   dptr = RSTRING_PTR(buffer);
@@ -934,7 +947,7 @@ VALUE SipMessageParser_has_error(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   return sip_message_parser_has_error(parser) ? Qtrue : Qfalse;
 }
@@ -950,7 +963,7 @@ VALUE SipMessageParser_error(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   if(sip_message_parser_has_error(parser)) {
     char *parsing_error_str;
@@ -1025,7 +1038,7 @@ VALUE SipMessageParser_is_finished(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   return sip_message_parser_is_finished(parser) ? Qtrue : Qfalse;
 }
@@ -1045,7 +1058,7 @@ VALUE SipMessageParser_parsed(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   /* NOTE: We can safely access here to parser->parsed as its content is also referenced
    * by id_parsed so it cannot be garbage collected while the OverSIP::MessageParser
@@ -1065,7 +1078,7 @@ VALUE SipMessageParser_nread(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   return INT2FIX(parser->nread);
 }
@@ -1082,7 +1095,7 @@ VALUE SipMessageParser_has_duplicated_core_header(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   /* NOTE: Good moment for counting the num of Via values and store it. */
   rb_ivar_set(parser->parsed, id_num_vias, INT2FIX(parser->num_via));
@@ -1115,7 +1128,7 @@ VALUE SipMessageParser_has_missing_core_header(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   if (parser->num_via == 0)
     return string_Via;
@@ -1136,7 +1149,7 @@ VALUE SipMessageParser_post_parsing(VALUE self)
 {
   TRACE();
   sip_message_parser *parser = NULL;
-  DATA_GET(self, sip_message_parser, parser);
+  TYPEDDATA_GET(self, sip_message_parser, parser, &sip_message_parser_type);
 
   /* We just parse Contact if it's a single header with a single Name Addr within it. */
   if (! (parser->contact_is_valid == 1 && parser->num_contact == 1))
@@ -1177,7 +1190,6 @@ VALUE SipMessageParser_Class_parse_uri(VALUE self, VALUE string, VALUE allow_nam
   TRACE();
   char *dptr = NULL;
   long dlen = 0;
-  sip_uri_parser *parser;
   VALUE parsed;
   int int_allow_name_addr;
 
