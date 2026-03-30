@@ -28,8 +28,8 @@ gem "eventmachine", "~> 1.2.0"
 require "eventmachine"
 # gem "iobuffer", "= 1.1.2"  # Using built-in extension instead
 require "oversip/iobuffer.#{RbConfig::CONFIG["DLEXT"]}"
-gem "em-udns", "= 0.3.6"
-require "em-udns"
+# gem "em-udns", "= 0.3.6"  # Using built-in extension instead
+require "oversip/em_udns.#{RbConfig::CONFIG["DLEXT"]}"
 gem "escape_utils", "= 1.0.1"
 require "escape_utils"
 gem "term-ansicolor", "= 1.3.2"

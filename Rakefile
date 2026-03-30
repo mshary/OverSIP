@@ -9,6 +9,7 @@ OVERSIP_EXTENSIONS = [
   { :dir => "ext/websocket_framing_utils", :lib => "ws_framing_utils.#{RbConfig::CONFIG["DLEXT"]}", :dest => "lib/oversip/websocket" },
   { :dir => "ext/websocket_http_parser", :lib => "ws_http_parser.#{RbConfig::CONFIG["DLEXT"]}", :dest => "lib/oversip/websocket" },
   { :dir => "ext/iobuffer", :lib => "iobuffer.#{RbConfig::CONFIG["DLEXT"]}", :dest => "lib/oversip" },
+  { :dir => "ext/em_udns", :lib => "em_udns.#{RbConfig::CONFIG["DLEXT"]}", :dest => "lib/oversip" },
 ]
 
 OVERSIP_EXTENSIONS.each do |ext|
