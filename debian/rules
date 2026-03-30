@@ -50,13 +50,10 @@ binary-indep: install
 	dh_installman
 	dh_installinit --restart-after-upgrade -- defaults 20
 	dh_link
-	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_installcron
 #	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

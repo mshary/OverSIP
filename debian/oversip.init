@@ -10,7 +10,7 @@
 # Description:       Start/stop OverSIP
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/var/lib/gems/2.1.0/bin:/var/lib/gems/1.9.1/bin
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 DESC=OverSIP
 HOMEDIR=/var/run/oversip
 RUN=no

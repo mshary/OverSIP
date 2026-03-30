@@ -1,14 +1,41 @@
 #!/bin/bash
 
-# Using this the generated stuf is clean after package is built.
-# Options -us and -uc prevent the package from being signed.
-dpkg-buildpackage -tc -us -uc
+set -e
 
-# Similar option. The second command cleans the generated stuf.
-#debuild -us -uc
-#./debian/rules clean
+echo "Building OverSIP Debian package..."
+echo "=================================="
 
-# Clean debian/files and the log file.
-rm -f debian/files
-rm -f debian/oversip.debhelper.log
+# Check if we're in the right directory
+if [ ! -f "debian/control" ]; then
+    echo "Error: debian/control not found. Run this script from the package root directory."
+    exit 1
+fi
+
+# Clean any previous build artifacts
+echo "Cleaning previous build artifacts..."
+rm -rf ../oversip_* ../oversip-* 2>/dev/null || true
+
+# Using dpkg-buildpackage to build the package.
+# Options:
+# -tc: clean source tree after build
+# -us: do not sign the source package
+# -uc: do not sign the .changes file
+# -b: build binary package only (no source)
+echo "Starting package build with dpkg-buildpackage..."
+dpkg-buildpackage -tc -us -uc -b
+
+echo ""
+echo "Package built successfully!"
+echo ""
+
+# Clean up temporary files (optional, -tc already does this)
+# The -tc flag should clean the source tree, but we'll also clean
+# the debian/files and log file as before.
+echo "Cleaning up temporary files..."
+rm -f debian/files debian/oversip.debhelper.log 2>/dev/null || true
+
+echo ""
+echo "Build complete. Packages are in the parent directory:"
+echo "------------------------------------------------------"
+ls -la ../oversip_* 2>/dev/null || ls -la ../oversip-* 2>/dev/null || echo "No package files found in parent directory."
 

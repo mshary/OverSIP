@@ -7,12 +7,10 @@
 set -e
 
 
-OVERSIP_GEM_VERSION="2.0.4"
-
-
 install_gem() {
-  echo "installing 'oversip' Ruby Gem version $OVERSIP_GEM_VERSION..."
-  gem install oversip --no-rdoc --no-ri -v $OVERSIP_GEM_VERSION
+  echo "installing 'oversip' Ruby Gem..."
+  # Use --no-document instead of deprecated --no-rdoc --no-ri
+  gem install oversip --no-document
 }
 
 case "$1" in
