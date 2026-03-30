@@ -56,7 +56,6 @@ static VALUE symbol_https;
 static void header(void *data, const char *hdr_field, size_t hdr_field_len, const char *hdr_value, size_t hdr_value_len)
 {
   TRACE();
-  char *ch, *end;
   VALUE parsed = (VALUE)data;
   VALUE v, f, el;
 
