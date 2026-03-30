@@ -1,10 +1,9 @@
-#include <ruby.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include "udns.h"
 #include "em-udns.h"
-
+#include <netinet/in.h>
+#include <ruby.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <udns.h>
 
 static VALUE mEm;
 static VALUE mUdns;
@@ -79,7 +78,7 @@ VALUE Resolver_alloc(VALUE klass)
   /* Copy the context to a new one. */
   if (!(dns_context = dns_new(NULL)))
     alloc_error = rb_str_new2("udns `dns_new' failed");
-  
+
   obj = TypedData_Wrap_Struct(klass, &dns_ctx_data_type, dns_context);
   if (TYPE(alloc_error) == T_STRING)
     rb_ivar_set(obj, rb_intern("@alloc_error"), alloc_error);
@@ -99,7 +98,7 @@ void timer_cb(struct dns_ctx *dns_context, int timeout, void *data)
   /* Cancel the EM::Timer. */
   if (TYPE(timer) != T_NIL)
     rb_funcall(timer, method_cancel, 0);
-  
+
   if (timeout >= 0)
     rb_funcall(resolver, method_set_timer, 1, INT2FIX(timeout));
 }
@@ -112,7 +111,7 @@ VALUE Resolver_dns_open(VALUE self)
   TypedData_Get_Struct(self, struct dns_ctx, &dns_ctx_data_type, dns_context);
 
   dns_set_tmcbck(dns_context, timer_cb, (void*)self);
-  
+
   /* Open the new context. */
   if (dns_open(dns_context) < 0)
     rb_raise(eUdnsError, "udns `dns_open' failed");
@@ -133,7 +132,7 @@ VALUE Resolver_fd(VALUE self)
 VALUE Resolver_ioevent(VALUE self)
 {
   struct dns_ctx *dns_context = NULL;
-    
+
   TypedData_Get_Struct(self, struct dns_ctx, &dns_ctx_data_type, dns_context);
   dns_ioevent(dns_context, 0);
   return Qfalse;
@@ -143,7 +142,7 @@ VALUE Resolver_ioevent(VALUE self)
 VALUE Resolver_timeouts(VALUE self)
 {
   struct dns_ctx *dns_context = NULL;
-  
+
   TypedData_Get_Struct(self, struct dns_ctx, &dns_ctx_data_type, dns_context);
   dns_timeouts(dns_context, -1, 0);
 
@@ -154,7 +153,7 @@ VALUE Resolver_timeouts(VALUE self)
 VALUE Resolver_cancel(VALUE self, VALUE query)
 {
   VALUE queries;
-  
+
   queries = rb_ivar_get(self, id_queries);
   if (TYPE(rb_hash_aref(queries, query)) == T_TRUE) {
     rb_hash_aset(queries, query, Qfalse);
@@ -197,7 +196,7 @@ static void* check_query(struct dns_ctx *dns_context, void *rr, void *data)
     if (rr) free(rr);
     return NULL;
   }
-  
+
   if ((status = dns_status(dns_context)) < 0) {
     if (rr) free(rr);
     switch(status) {
@@ -231,9 +230,9 @@ static void dns_result_A_cb(struct dns_ctx *dns_context, struct dns_rr_a4 *rr, v
   VALUE array;
   int i;
   char ip[INET_ADDRSTRLEN];
-  
+
   if (!(query = (VALUE)check_query(dns_context, rr, data)))  return;
-  
+
   array = rb_ary_new2(rr->dnsa4_nrr);
   for(i = 0; i < rr->dnsa4_nrr; i++)
     rb_ary_push(array, rb_str_new2((char *)dns_ntop(AF_INET, &(rr->dnsa4_addr[i].s_addr), ip, INET_ADDRSTRLEN)));
@@ -266,14 +265,14 @@ static void dns_result_PTR_cb(struct dns_ctx *dns_context, struct dns_rr_ptr *rr
   VALUE query;
   VALUE array;
   int i;
-  
+
   if (!(query = (VALUE)check_query(dns_context, rr, data)))  return;
 
   array = rb_ary_new2(rr->dnsptr_nrr);
   for(i = 0; i < rr->dnsptr_nrr; i++)
     rb_ary_push(array, rb_str_new2(rr->dnsptr_ptr[i]));
   free(rr);
-  
+
   rb_funcall(query, method_do_success, 1, array);
 }
 
@@ -400,7 +399,6 @@ VALUE Resolver_submit_A(VALUE self, VALUE rb_domain)
   VALUE error;
   struct resolver_query *data;
 
-  
   TypedData_Get_Struct(self, struct dns_ctx, &dns_ctx_data_type, dns_context);
   domain = StringValueCStr(rb_domain);
   query = rb_obj_alloc(cQuery);
@@ -408,7 +406,7 @@ VALUE Resolver_submit_A(VALUE self, VALUE rb_domain)
   data = ALLOC(struct resolver_query);
   data->resolver = self;
   data->query = query;
-  
+
   if (!dns_submit_a4(dns_context, domain, 0, dns_result_A_cb, (void *)data)) {
     error = get_dns_error(dns_context);
     xfree(data);
@@ -417,7 +415,7 @@ VALUE Resolver_submit_A(VALUE self, VALUE rb_domain)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
@@ -446,7 +444,7 @@ VALUE Resolver_submit_AAAA(VALUE self, VALUE rb_domain)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
@@ -532,7 +530,7 @@ VALUE Resolver_submit_MX(VALUE self, VALUE rb_domain)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
@@ -561,7 +559,7 @@ VALUE Resolver_submit_TXT(VALUE self, VALUE rb_domain)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
@@ -590,11 +588,11 @@ VALUE Resolver_submit_SRV(int argc, VALUE *argv, VALUE self)
   TypedData_Get_Struct(self, struct dns_ctx, &dns_ctx_data_type, dns_context);
   domain = StringValueCStr(argv[0]);
   query = rb_obj_alloc(cQuery);
-  
+
   data = ALLOC(struct resolver_query);
   data->resolver = self;
   data->query = query;
-  
+
   if (!dns_submit_srv(dns_context, domain, service, protocol, 0, dns_result_SRV_cb, (void *)data)) {
     error = get_dns_error(dns_context);
     xfree(data);
@@ -603,7 +601,7 @@ VALUE Resolver_submit_SRV(int argc, VALUE *argv, VALUE self)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
@@ -632,7 +630,7 @@ VALUE Resolver_submit_NAPTR(VALUE self, VALUE rb_domain)
   else {
     rb_hash_aset(rb_ivar_get(self, id_queries), query, Qtrue);
   }
-  
+
   return query;
 }
 
