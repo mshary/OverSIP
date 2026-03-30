@@ -98,5 +98,6 @@ _END_
     test/test_*.rb
   }
 
-  spec.has_rdoc = false
+  # spec.has_rdoc is deprecated in modern RubyGems
+  # RDoc generation is controlled via .rdoc_options file or gem command flags
 end

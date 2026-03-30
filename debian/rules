@@ -8,19 +8,25 @@ build: build-stamp
 
 build-stamp:
 	dh_testdir
+	# Build the Ruby gem
+	gem build oversip.gemspec
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf build-stamp oversip
+	rm -rf build-stamp oversip oversip-*.gem
 	dh_prep
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_prep -k
+	dh_prep
 	dh_installdirs /etc
+	dh_installdirs /usr/share/oversip
+	
+	# Install the built gem to package directory
+	install -m 644 oversip-*.gem debian/oversip/usr/share/oversip/
 
 	mkdir -p $(CURDIR)/debian/oversip/etc/oversip/
 	mkdir -p $(CURDIR)/debian/oversip/etc/oversip/tls/

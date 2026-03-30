@@ -21,8 +21,9 @@ rm -rf ../oversip_* ../oversip-* 2>/dev/null || true
 # -us: do not sign the source package
 # -uc: do not sign the .changes file
 # -b: build binary package only (no source)
+# -d: do not check build dependencies (needed on Fedora/RPM systems)
 echo "Starting package build with dpkg-buildpackage..."
-dpkg-buildpackage -tc -us -uc -b
+dpkg-buildpackage -tc -us -uc -b -d
 
 echo ""
 echo "Package built successfully!"

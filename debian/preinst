@@ -8,9 +8,9 @@ set -e
 
 
 install_gem() {
-  echo "installing 'oversip' Ruby Gem..."
-  # Use --no-document instead of deprecated --no-rdoc --no-ri
-  gem install oversip --no-document
+  echo "installing 'oversip' Ruby Gem from local package..."
+  # Install from the locally packaged gem file
+  gem install /usr/share/oversip/oversip-*.gem --no-document
 }
 
 case "$1" in
