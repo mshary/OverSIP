@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # coding: utf-8
 
 require "oversip_test_helper"
@@ -69,27 +70,27 @@ m=video 3227 RTP/AVP 31\r
 a=rtpmap:31 LPC\r
 END
 
-    assert_equal msg.class, OverSIP::SIP::Request
-    assert_equal msg.sip_method, :INVITE
-    assert_equal msg.sip_version, "SIP/2.0"
+    assert_equal OverSIP::SIP::Request, msg.class
+    assert_equal :INVITE, msg.sip_method
+    assert_equal "SIP/2.0", msg.sip_version
     assert_true msg.initial?
 
     assert_false parser.duplicated_core_header?
-    assert_equal parser.missing_core_header?, "Call-ID"
+    assert_equal "Call-ID", parser.missing_core_header?
 
-    assert_equal msg.num_vias, 2
-    assert_equal msg.via_sent_by_host, "host5.example.net"
+    assert_equal 2, msg.num_vias
+    assert_equal "host5.example.net", msg.via_sent_by_host
     assert_nil msg.via_sent_by_port
     assert_nil msg.via_received
     assert_true msg.via_rport?
-    assert_equal msg.via_core_value, "SIP/2.0/UDP host5.example.net"
+    assert_equal "SIP/2.0/UDP host5.example.net", msg.via_core_value
     assert_nil msg.via_params
     assert_equal ["SIP/2.0/UDP host5.example.net;branch=z9hG4bKkdjuw ; Rport", "SIP/2.0/TCP 1.2.3.4;branch=z9hG4bKkdjuw"], msg.hdr_via
 
-    assert_equal msg.cseq, 234234
-    assert_equal msg.max_forwards, 87
-    assert_equal msg.content_length, 150
-    assert_equal msg.body.bytesize, 150
+    assert_equal 234234, msg.cseq
+    assert_equal 87, msg.max_forwards
+    assert_equal 150, msg.content_length
+    assert_equal 150, msg.body.bytesize
 
     assert_equal "sip:sips%3auser%40example.com@example.net.;transport=tcp;foo=baz?subject=lalala", msg.ruri.uri.downcase
     assert_equal :sip, msg.ruri.scheme

@@ -37,8 +37,7 @@ CLEAN.include("thirdparty/stud/mkmf.log")
 CLEAN.include("bin/oversip_stud")
 
 
-OVERSIP_COMPILE_ITEMS = OVERSIP_EXTENSIONS.map {|e| e[:lib]} << "bin/oversip_stud"
-
+OVERSIP_COMPILE_ITEMS = OVERSIP_EXTENSIONS.map {|e| e[:lib]}
 task :default => :compile
 
 desc "Compile"
