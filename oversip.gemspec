@@ -22,7 +22,7 @@ _END_
 
   spec.required_ruby_version = ">= 1.9.3"
   spec.add_dependency "eventmachine", "~> 1.2.0", ">= 1.2.0.1"
-  spec.add_dependency "iobuffer", "= 1.1.2"
+  # spec.add_dependency "iobuffer", "= 1.1.2"  # Using built-in extension instead
   spec.add_dependency "em-udns", "= 0.3.6"
   spec.add_dependency "escape_utils", "= 1.0.1"
   spec.add_dependency "term-ansicolor", "= 1.3.2"
@@ -67,6 +67,10 @@ _END_
     ext/websocket_framing_utils/*.h
     ext/websocket_framing_utils/*.c
 
+    ext/iobuffer/extconf.rb
+    ext/iobuffer/*.h
+    ext/iobuffer/*.c
+
     ext/stud/extconf.rb
 
     thirdparty/stud/stud.tar.gz
@@ -88,6 +92,7 @@ _END_
     ext/utils/extconf.rb
     ext/websocket_http_parser/extconf.rb
     ext/websocket_framing_utils/extconf.rb
+    ext/iobuffer/extconf.rb
     ext/stud/extconf.rb
   }
 
