@@ -90,7 +90,7 @@ module OverSIP
     # - validated: true if the given certificate(s) have been validated, false otherwise
     #              and nil if no certificate is provided by peer or no CA's were configured
     #              for TLS validation.
-    # - tls_error: OpenSSL validation error code (Fixnum) in case of validation error.
+    # - tls_error: OpenSSL validation error code (Integer) in case of validation error.
     # - tls_error_string: OpenSSL validation error string in case of validation error.
     def self.validate pems
       return nil, nil, nil, "no CAs provided, validation disabled"  unless @store

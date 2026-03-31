@@ -44,7 +44,7 @@ static VALUE mStun;
  * Expects 3 arguments:
  * - String containing a STUN Binding Request (MUST not be empty!!).
  * - String containing the source IP of the request.
- * - Fxinum containing the source port of the request.
+ * - Integer containing the source port of the request.
  * Return value:
  * - If it's a valid STUN Binding Request, returns a Ruby String representing the
  *   STUN Binding Response.
@@ -104,7 +104,7 @@ VALUE Stun_parse_request(VALUE self, VALUE rb_stun_request, VALUE rb_source_ip, 
     rb_raise(rb_eTypeError, "Third argument must be a String containing the source IP");
 
   if (TYPE(rb_source_port) != T_FIXNUM)
-    rb_raise(rb_eTypeError, "Fourth argument must be a Fixnum containing the source port");
+    rb_raise(rb_eTypeError, "Fourth argument must be an Integer containing the source port");
 
   /*
    * RFC 5389 section 6.

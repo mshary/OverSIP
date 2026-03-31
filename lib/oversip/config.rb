@@ -511,7 +511,7 @@ module OverSIP
               colorize ? color.yellow(humanized_value) : humanized_value
             when ::Array
               colorize ? color.yellow(humanized_value) : humanized_value
-            when ::Fixnum, ::Float
+            when ::Integer, ::Float
               colorize ? color.bold(color.blue(humanized_value)) : humanized_value
             else
               humanized_value
@@ -530,7 +530,7 @@ module OverSIP
         when ::String           ; value
         when ::Symbol           ; value.to_s
         when ::Array            ; value.join(", ")
-        when ::Fixnum, ::Float  ; value.to_s
+        when ::Integer, ::Float  ; value.to_s
         else                    ; value.to_s
         end
     end

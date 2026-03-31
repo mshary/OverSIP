@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Doc: http://wiki.debian.org/MaintainerScripts
+
+#DEBHELPER#
+
+set -e
+
+
+install_gem() {
+  echo "installing 'oversip' Ruby Gem from local package..."
+  
+  # Check if gem command is available
+  if ! command -v gem >/dev/null 2>&1; then
+    echo "ERROR: 'gem' command not found. Ruby or rubygems may not be installed." >&2
+    return 1
+  fi
+  
+  # Look for gem file in /usr/share/oversip/
+  GEM_DIR="/usr/share/oversip"
+  
+  if [ ! -d "$GEM_DIR" ]; then
+    echo "ERROR: Gem directory $GEM_DIR does not exist" >&2
+    return 1
+  fi
+  
+  # Find the most recent oversip gem file
+  GEM_FILE=$(find "$GEM_DIR" -maxdepth 1 -name "oversip-*.gem" -type f | sort -V | tail -1)
+  
+  if [ -z "$GEM_FILE" ] || [ ! -f "$GEM_FILE" ]; then
+    echo "ERROR: Could not find oversip gem file in $GEM_DIR" >&2
+    return 1
+  fi
+  
+  echo "Found gem file: $GEM_FILE"
+  
+  # Install from the locally packaged gem file
+  # Use --force to overwrite if already installed (for upgrades)
+  gem install "$GEM_FILE" --no-document --force
+}
+
+case "$1" in
+
+  configure)
+    # Install the Ruby gem.
+    install_gem
+    ;;
+
+esac
+
+exit 0
+
+#DEBHELPER#

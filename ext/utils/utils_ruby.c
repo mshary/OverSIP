@@ -289,7 +289,7 @@ VALUE Utils_to_pure_ip(VALUE self, VALUE string)
  * where:
  *   - ip_type is :ipv4 or :ipv6,
  *   - ip is a String,
- *   - port is a Fixnum
+ *   - port is an Integer
  * If the string is invalid it returns false.
  */
 VALUE Utils_parser_outbound_udp_flow_token(VALUE self, VALUE string)
@@ -329,10 +329,10 @@ VALUE Utils_parser_outbound_udp_flow_token(VALUE self, VALUE string)
  * an Array as follows:
  *   [ num_bytes, ip_type, ip, port ]
  * where:
- *   - num_bytes is the length of the HAProxy Protocol line (to be removed), a Fixnum.
+ *   - num_bytes is the length of the HAProxy Protocol line (to be removed), an Integer.
  *   - ip_type is :ipv4 or :ipv6,
  *   - ip is a String,
- *   - port is a Fixnum
+ *   - port is an Integer
  * If the string is invalid it returns false.
  */
 VALUE Utils_parser_haproxy_protocol(VALUE self, VALUE string)

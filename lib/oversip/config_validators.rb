@@ -21,7 +21,7 @@ module OverSIP
       end
 
       def fixnum value
-        value.is_a? ::Fixnum
+        value.is_a? ::Integer
       end
 
       def port value

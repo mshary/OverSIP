@@ -6,13 +6,6 @@
 
 set -e
 
-
-install_gem() {
-  echo "installing 'oversip' Ruby Gem from local package..."
-  # Install from the locally packaged gem file
-  gem install /usr/share/oversip/oversip-*.gem --no-document
-}
-
 case "$1" in
 
   install)
@@ -20,14 +13,10 @@ case "$1" in
     adduser --quiet --system --group --disabled-password \
             --shell /bin/false --gecos "OverSIP" \
             --home /var/run/oversip oversip || true
-
-    # Install the Ruby gem.
-    install_gem
     ;;
 
   upgrade)
-    # Install the Ruby gem.
-    install_gem
+    # Nothing to do in preinst for upgrade
     ;;
 
 esac

@@ -347,7 +347,7 @@ IO_Buffer_read(int argc, VALUE * argv, VALUE self)
  *    IO_Buffer#read_frame(str, mark) -> boolean
  *
  * Read up to and including the given frame marker (expressed a a
- * Fixnum 0-255) byte, copying into the supplied string object. If the mark is
+ * Integer 0-255) byte, copying into the supplied string object. If the mark is
  * not encountered before the end of the buffer, false is returned but data
  * is still copied into str. True is returned if the end of a frame is reached.
  *
