@@ -25,7 +25,7 @@ NAME=oversip
 . /lib/lsb/init-functions
 
 # Debian LSB functions don't add \n in function log_begin_msg().
-# In Ubuntu such function is overriden in /etc/lsb-base-logging.sh.
+# In Ubuntu such function is overridden in /etc/lsb-base-logging.sh.
 UBUNTU_LOGGING=0
 [ -r /etc/lsb-base-logging.sh ] && UBUNTU_LOGGING=1
 
@@ -86,7 +86,7 @@ check_homedir()
   # Useful in Ubuntu as /var/run/ content is deleted in shutdown.
   if [ ! -d $HOMEDIR ] ; then mkdir $HOMEDIR ; fi
 
-  # Set the appropiate owner and group
+  # Set the appropriate owner and group
   if [ -n "$USER" ] ; then chown ${USER} $HOMEDIR ; fi
   if [ -n "$GROUP" ] ; then chgrp ${GROUP} $HOMEDIR ; fi
 }

@@ -1,0 +1,33 @@
+#!/bin/sh
+# Wrapper script for systemd to match the behavior of the init script
+
+# Read environment file if it exists
+if [ -r /etc/default/oversip ]; then
+    . /etc/default/oversip
+fi
+
+# Set defaults if not set
+: ${USER:=oversip}
+: ${GROUP:=oversip}
+: ${CONFIG_DIR:=/etc/oversip}
+: ${CONFIG_FILE:=oversip.conf}
+
+# Build options
+OPTIONS="-P /var/run/oversip/oversip.pid -p oversip"
+
+# Add options if variables are set
+if [ -n "$USER" ]; then
+    OPTIONS="$OPTIONS -u $USER"
+fi
+if [ -n "$GROUP" ]; then
+    OPTIONS="$OPTIONS -g $GROUP"
+fi
+if [ -n "$CONFIG_DIR" ]; then
+    OPTIONS="$OPTIONS --config-dir $CONFIG_DIR"
+fi
+if [ -n "$CONFIG_FILE" ]; then
+    OPTIONS="$OPTIONS --config-file $CONFIG_FILE"
+fi
+
+# Run oversip with the constructed options
+exec /usr/bin/oversip $OPTIONS

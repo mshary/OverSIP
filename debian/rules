@@ -24,9 +24,13 @@ install: build
 	dh_prep
 	dh_installdirs /etc
 	dh_installdirs /usr/share/oversip
+	dh_installdirs /usr/lib/oversip
 	
 	# Install the built gem to package directory
 	install -m 644 oversip-*.gem debian/oversip/usr/share/oversip/
+
+	# Install systemd wrapper script
+	install -m 755 debian/oversip-systemd-wrapper debian/oversip/usr/lib/oversip/
 
 	mkdir -p $(CURDIR)/debian/oversip/etc/oversip/
 	mkdir -p $(CURDIR)/debian/oversip/etc/oversip/tls/
@@ -55,6 +59,7 @@ binary-indep: install
 	dh_installexamples
 	dh_installman
 	dh_installinit --restart-after-upgrade -- defaults 20
+	dh_installsystemd
 	dh_link
 	dh_compress
 	dh_fixperms
