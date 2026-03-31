@@ -60,6 +60,7 @@ binary-indep: install
 	dh_installman
 	dh_installinit --restart-after-upgrade -- defaults 20
 	dh_installsystemd
+	dh_installdebconf
 	dh_link
 	dh_compress
 	dh_fixperms

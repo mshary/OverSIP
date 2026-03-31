@@ -1,0 +1,25 @@
+Template: oversip/overwrite-config
+Type: boolean
+Default: false
+Description: Overwrite existing OverSIP configuration files?
+ Configuration files for OverSIP already exist in /etc/oversip/.
+ If you choose to overwrite them, your current configuration will be
+ replaced with the package defaults. The old files will be backed up
+ with a .dpkg-old extension.
+ .
+ If you choose not to overwrite them, the package defaults will be
+ installed with a .dpkg-dist extension and you can manually merge
+ changes.
+
+Template: oversip/overwrite-tls
+Type: boolean
+Default: false
+Description: Overwrite existing OverSIP TLS certificate files?
+ TLS certificate and key files for OverSIP already exist in /etc/oversip/tls/.
+ If you choose to overwrite them, your current TLS files will be
+ replaced with the package defaults (demo certificates). The old files
+ will be backed up with a .dpkg-old extension.
+ .
+ WARNING: Overwriting TLS files may break existing TLS connections.
+ Only overwrite if you understand the consequences or are doing a
+ fresh installation.

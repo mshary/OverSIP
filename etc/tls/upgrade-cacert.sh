@@ -8,5 +8,5 @@
 # the local version of the file.
 
 cd ca/
-wget -N http://curl.haxx.se/ca/cacert.pem
+wget -N https://curl.se/ca/cacert.pem
 

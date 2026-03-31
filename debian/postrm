@@ -13,6 +13,12 @@ case "$1" in
     # Remove the Ruby gem.
     echo "uninstalling 'oversip' Ruby Gem(s)..."
     gem uninstall oversip -a -x
+    
+    # Clean up any leftover binary in /usr/local/bin (from old installations)
+    if [ -f /usr/local/bin/oversip ]; then
+      echo "Removing leftover binary from /usr/local/bin/oversip..."
+      rm -f /usr/local/bin/oversip
+    fi
     ;;
 
 esac

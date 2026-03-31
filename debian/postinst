@@ -36,12 +36,104 @@ install_gem() {
   
   # Install from the locally packaged gem file
   # Use --force to overwrite if already installed (for upgrades)
-  gem install "$GEM_FILE" --no-document --force
+  # Use --bindir /usr/bin to install binary to standard Debian location
+  gem install "$GEM_FILE" --no-document --force --bindir /usr/bin
+  
+  # Clean up any old binary in /usr/local/bin from previous installations
+  if [ -f /usr/local/bin/oversip ]; then
+    echo "Removing old binary from /usr/local/bin/oversip..."
+    rm -f /usr/local/bin/oversip
+  fi
+}
+
+handle_config_files() {
+  # Check if any config files already exist
+  CONFIG_FILES_EXIST=0
+  TLS_FILES_EXIST=0
+  
+  # Check for main config files
+  for file in oversip.conf proxies.conf server.rb; do
+    if [ -f "/etc/oversip/$file" ]; then
+      CONFIG_FILES_EXIST=1
+      break
+    fi
+  done
+  
+  # Check for TLS files (excluding CA certs which are less critical)
+  for file in demo-tls.oversip.net.crt demo-tls.oversip.net.key; do
+    if [ -f "/etc/oversip/tls/$file" ]; then
+      TLS_FILES_EXIST=1
+      break
+    fi
+  done
+  
+  # Load debconf database
+  if [ -x /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+  fi
+  
+  # Handle main config files
+  if [ $CONFIG_FILES_EXIST -eq 1 ]; then
+    # Ask via debconf whether to overwrite
+    db_get oversip/overwrite-config
+    OVERWRITE_CONFIG="$RET"
+    
+    if [ "$OVERWRITE_CONFIG" = "true" ]; then
+      echo "Overwriting existing configuration files (backing up old versions)..."
+      for file in oversip.conf proxies.conf server.rb; do
+        if [ -f "/etc/oversip/$file" ]; then
+          mv "/etc/oversip/$file" "/etc/oversip/$file.dpkg-old" 2>/dev/null || true
+        fi
+      done
+    else
+      echo "Keeping existing configuration files (installing package defaults as .dpkg-dist)..."
+      for file in oversip.conf proxies.conf server.rb; do
+        if [ -f "/etc/oversip/$file" ]; then
+          if [ ! -f "/etc/oversip/$file.dpkg-dist" ]; then
+            cp "/etc/oversip/$file" "/etc/oversip/$file.dpkg-dist" 2>/dev/null || true
+          fi
+        fi
+      done
+    fi
+  fi
+  
+  # Handle TLS files
+  if [ $TLS_FILES_EXIST -eq 1 ]; then
+    # Ask via debconf whether to overwrite TLS files
+    db_get oversip/overwrite-tls
+    OVERWRITE_TLS="$RET"
+    
+    if [ "$OVERWRITE_TLS" = "true" ]; then
+      echo "Overwriting existing TLS files (backing up old versions)..."
+      for file in demo-tls.oversip.net.crt demo-tls.oversip.net.key; do
+        if [ -f "/etc/oversip/tls/$file" ]; then
+          mv "/etc/oversip/tls/$file" "/etc/oversip/tls/$file.dpkg-old" 2>/dev/null || true
+        fi
+      done
+    else
+      echo "Keeping existing TLS files (installing package defaults as .dpkg-dist)..."
+      for file in demo-tls.oversip.net.crt demo-tls.oversip.net.key; do
+        if [ -f "/etc/oversip/tls/$file" ]; then
+          if [ ! -f "/etc/oversip/tls/$file.dpkg-dist" ]; then
+            cp "/etc/oversip/tls/$file" "/etc/oversip/tls/$file.dpkg-dist" 2>/dev/null || true
+          fi
+        fi
+      done
+    fi
+  fi
+  
+  # Clean up debconf
+  if [ -x /usr/share/debconf/confmodule ]; then
+    db_stop
+  fi
 }
 
 case "$1" in
 
   configure)
+    # Handle configuration files first (before installing gem)
+    handle_config_files
+    
     # Install the Ruby gem.
     install_gem
     ;;

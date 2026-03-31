@@ -4,6 +4,7 @@ Priority: optional
 Maintainer: Iñaki Baz Castillo <ibc@aliax.net>
 Homepage: http://www.oversip.net
 Build-Depends: debhelper (>= 13), libudns-dev, ruby-dev (>= 2.7.0), make, g++, libssl-dev, libev-dev, ragel, pkg-config
+Build-Depends-Indep: debconf
 Standards-Version: 4.6.2
 
 Package: oversip
