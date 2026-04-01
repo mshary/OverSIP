@@ -6,6 +6,23 @@
 
 set -e
 
+# Check if we're in a chroot environment or if systemctl is not available
+# This can help avoid errors from deb-systemd-invoke
+IN_CHROOT=0
+if [ -n "$debian_chroot" ] || [ "$(stat -c %d:%i /)" != "$(stat -c %d:%i /proc/1/root/.)" ]; then
+    IN_CHROOT=1
+fi
+
+SYSTEMCTL_AVAILABLE=0
+if command -v systemctl >/dev/null 2>&1 && [ $IN_CHROOT -eq 0 ]; then
+    SYSTEMCTL_AVAILABLE=1
+fi
+
+# If systemctl is not available, set environment variable to skip systemd operations
+if [ $SYSTEMCTL_AVAILABLE -eq 0 ]; then
+    export DEBIAN_SYSTEMD_SKIP=1
+fi
+
 
 install_gem() {
   echo "installing 'oversip' Ruby Gem from local package..."
@@ -67,17 +84,28 @@ handle_config_files() {
     fi
   done
   
-  # Load debconf database
+  # Load debconf database if available
+  DEBCONF_AVAILABLE=0
   if [ -x /usr/share/debconf/confmodule ]; then
     . /usr/share/debconf/confmodule
+    # Check if db_get function is available after sourcing
+    if type db_get >/dev/null 2>&1; then
+      DEBCONF_AVAILABLE=1
+    fi
   fi
-  
+
   # Handle main config files
   if [ $CONFIG_FILES_EXIST -eq 1 ]; then
-    # Ask via debconf whether to overwrite
-    db_get oversip/overwrite-config
-    OVERWRITE_CONFIG="$RET"
-    
+    OVERWRITE_CONFIG="false"
+    # Ask via debconf whether to overwrite if debconf is available
+    if [ $DEBCONF_AVAILABLE -eq 1 ]; then
+      db_get oversip/overwrite-config
+      OVERWRITE_CONFIG="$RET"
+    else
+      # If debconf is not available, default to not overwriting
+      echo "debconf not available, keeping existing configuration files (installing package defaults as .dpkg-dist)..."
+    fi
+
     if [ "$OVERWRITE_CONFIG" = "true" ]; then
       echo "Overwriting existing configuration files (backing up old versions)..."
       for file in oversip.conf proxies.conf server.rb; do
@@ -96,13 +124,19 @@ handle_config_files() {
       done
     fi
   fi
-  
+
   # Handle TLS files
   if [ $TLS_FILES_EXIST -eq 1 ]; then
-    # Ask via debconf whether to overwrite TLS files
-    db_get oversip/overwrite-tls
-    OVERWRITE_TLS="$RET"
-    
+    OVERWRITE_TLS="false"
+    # Ask via debconf whether to overwrite TLS files if debconf is available
+    if [ $DEBCONF_AVAILABLE -eq 1 ]; then
+      db_get oversip/overwrite-tls
+      OVERWRITE_TLS="$RET"
+    else
+      # If debconf is not available, default to not overwriting
+      echo "debconf not available, keeping existing TLS files (installing package defaults as .dpkg-dist)..."
+    fi
+
     if [ "$OVERWRITE_TLS" = "true" ]; then
       echo "Overwriting existing TLS files (backing up old versions)..."
       for file in demo-tls.oversip.net.crt demo-tls.oversip.net.key; do
@@ -121,9 +155,9 @@ handle_config_files() {
       done
     fi
   fi
-  
-  # Clean up debconf
-  if [ -x /usr/share/debconf/confmodule ]; then
+
+  # Clean up debconf if available
+  if [ $DEBCONF_AVAILABLE -eq 1 ]; then
     db_stop
   fi
 }

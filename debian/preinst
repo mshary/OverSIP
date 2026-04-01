@@ -6,6 +6,23 @@
 
 set -e
 
+# Check if we're in a chroot environment or if systemctl is not available
+# This can help avoid errors from deb-systemd-invoke
+IN_CHROOT=0
+if [ -n "$debian_chroot" ] || [ "$(stat -c %d:%i /)" != "$(stat -c %d:%i /proc/1/root/.)" ]; then
+    IN_CHROOT=1
+fi
+
+SYSTEMCTL_AVAILABLE=0
+if command -v systemctl >/dev/null 2>&1 && [ $IN_CHROOT -eq 0 ]; then
+    SYSTEMCTL_AVAILABLE=1
+fi
+
+# If systemctl is not available, set environment variable to skip systemd operations
+if [ $SYSTEMCTL_AVAILABLE -eq 0 ]; then
+    export DEBIAN_SYSTEMD_SKIP=1
+fi
+
 case "$1" in
 
   install)

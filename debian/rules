@@ -59,7 +59,10 @@ binary-indep: install
 	dh_installexamples
 	dh_installman
 	dh_installinit --restart-after-upgrade -- defaults 20
-	dh_installsystemd
+	# Only install systemd service if systemd is available
+	# Use --no-enable to avoid trying to enable the service during build
+	# and --no-start to avoid trying to start it
+	dh_installsystemd --no-enable --no-start
 	dh_installdebconf
 	dh_link
 	dh_compress
