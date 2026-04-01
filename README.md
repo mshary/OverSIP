@@ -4,7 +4,11 @@
 
 ## Notice
 
-This project is no longer maintained. If you wish to maintain it, contact the authors (see below).
+OverSIP has been long dead but I had to resurrect it for a client project. Besides the dependency and security update patches, I have also added many new features per my project needs.
+
+Feel free to use and extend it per end-user license agreement.
+
+~~This project is no longer maintained. If you wish to maintain it, contact the authors (see below).~~
 
 
 ## Website

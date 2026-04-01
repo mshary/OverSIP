@@ -20,3 +20,8 @@ CONTRIBUTORS
 - José Luis Millán <jmillan@aliax.net> (Github @jmillan)
 
   Intensive testing with JsSIP library acting as a SIP Outbound UA with OverSIP.
+
+- Muhammad Shahzad Shafi <shaheryarkh@gmail.com> (Github @mshary)
+
+  Resurrection of project from the dead, security patches and dependency updates
+  to work with Debian >= 12.x
