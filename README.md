@@ -46,6 +46,7 @@ OverSIP is a powerful and flexible SIP proxy & server by the authors of [RFC 711
 * José Luis Millán (<jmillan@aliax.net> | [github](https://github.com/jmillan) | [twitter](https://twitter.com/jomivi))
 * Saúl Ibarra Corretgé (<saghul@gmail.com> | [github](https://github.com/saghul) | [twitter](https://twitter.com/saghul))
 * Jon Bonilla (<manwe@aholab.ehu.es> |  [github](https://github.com/manwe) | [twitter](https://twitter.com/jbmanwe))
+* Muhammad Shahzad Shafi (<shaheryarkh@gmail.com> |  [github](https://github.com/mshary))
 
 ## License
 
