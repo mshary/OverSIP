@@ -3,13 +3,13 @@ Section: comm
 Priority: optional
 Maintainer: Iñaki Baz Castillo <ibc@aliax.net>
 Homepage: http://www.oversip.net
-Build-Depends: debhelper (>= 13), libudns-dev, ruby-dev (>= 2.7.0), make, g++, libssl-dev, libev-dev, ragel, pkg-config
+Build-Depends: debhelper (>= 13), libudns-dev (>= 0.4-1), ruby-dev (>= 2.7.0), make, g++, libssl-dev, libev-dev, ragel, pkg-config
 Build-Depends-Indep: debconf
 Standards-Version: 4.6.2
 
 Package: oversip
 Architecture: all
-Depends: ${misc:Depends}, ruby (>= 2.7.0), libssl1.1 | libssl3, libev4 | libev5, libudns0, ruby-posix-spawn
+Depends: ${misc:Depends}, ruby (>= 2.7.0), libssl1.1 | libssl3, libev4 | libev5, libudns0 (>= 0.4-1), ruby-posix-spawn
 Suggests: unbound
 Description: OverSIP (the SIP framework you dreamed about)
   OverSIP is an async SIP proxy/server programmable in Ruby language.
